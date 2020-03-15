@@ -1,6 +1,7 @@
 export default class CellInfo {
-  constructor(store, data, id, row, cell) {
+  constructor(store, data, id, row, col) {
     this.store = store;
+    // 默认样式
     this.style = {
       // 字段格式
       fieldStyle: {
@@ -57,6 +58,7 @@ export default class CellInfo {
         // 列宽
         cellWidth: null
       },
+      // 单元格的合并属性
       cellSetting: {
         colSpan: 1,
         rowSpan: 1
@@ -69,57 +71,67 @@ export default class CellInfo {
       fontColor: "#000000",
       // 边框设置
       borderStyle: {
-        leftStyle: {
+        leftBorder: {
           // 边框线条宽度
           width: "1px",
-          // 细线
+          // 细线--默认
           isSolid: false,
-          // 虚线--默认
+          // 虚线
           isDashed: true,
           // 边框颜色
           color: "#e8ecf2"
         },
-        rightStyle: {
+        rightBorder: {
           // 边框线条宽度
           width: "1px",
-          // 细线
+          // 细线--默认
           isSolid: false,
-          // 虚线--默认
+          // 虚线
           isDashed: true,
           // 边框颜色
           color: "#e8ecf2"
         },
-        topStyle: {
+        topBorder: {
           // 边框线条宽度
           width: "1px",
-          // 细线
+          // 细线--默认
           isSolid: false,
-          // 虚线--默认
+          // 虚线
           isDashed: true,
           // 边框颜色
           color: "#e8ecf2"
         },
-        bottomStyle: {
+        bottomBorder: {
           // 边框线条宽度
           width: "1px",
-          // 细线
+          // 细线--默认
           isSolid: false,
-          // 虚线--默认
+          // 虚线
           isDashed: true,
           // 边框颜色
           color: "#e8ecf2"
         }
       }
     };
+    // 单元格所在的行下标
     this.row = row;
-    this.cell = cell;
+    // 单元格所在的列下标
+    this.col = col;
+    // 单元格绑定的数据
     this.data = data || {};
+    // 单元格是否为合并的状态
+    this.isMerge = false;
+    // 单元格的ID
     this.id = id || 0;
+    // 单元格是否在选中的范围内
+    this.wasDuring = false;
+    // 单元格是否要显示出来
+    this.isShow = true;
   }
 
   /**
    * @description 设置单元格默认样式
-   * @return {{backgroundColor: string, textAlign: string, borderStyle: {leftStyle: {isSolid: boolean, color: string, isDashed: boolean, width: string}, rightStyle: {isSolid: boolean, color: string, isDashed: boolean, width: string}, bottomStyle: {isSolid: boolean, color: string, isDashed: boolean, width: string}, topStyle: {isSolid: boolean, color: string, isDashed: boolean, width: string}}, cellStyle: {cellWeight: null, lineHeight: null}, fieldStyle: {amount: {isRMB: boolean, isUSD: boolean, isEUR: boolean, isGBP: boolean}, dateFormat: {fullDate: boolean, dateAndTime: boolean, monthAndDate: boolean, yearAndMonth: boolean, fullShortDate: boolean}, percentage: boolean, text: boolean, numericalStyle: {orderByASC: boolean, emptyShowWait: boolean, showThousandSplit: boolean, emptyShowNull: boolean, digitNum: null, emptyShowZero: boolean}}, cellSetting: {rowSpan: number, colSpan: number}, fontWeight: boolean, fontColor: string}}
+   * @return {{backgroundColor: string, textAlign: string, borderStyle: {leftBorder: {isSolid: boolean, color: string, isDashed: boolean, width: string}, rightBorder: {isSolid: boolean, color: string, isDashed: boolean, width: string}, bottomBorder: {isSolid: boolean, color: string, isDashed: boolean, width: string}, topBorder: {isSolid: boolean, color: string, isDashed: boolean, width: string}}, cellStyle: {cellWeight: null, lineHeight: null}, fieldStyle: {amount: {isRMB: boolean, isUSD: boolean, isEUR: boolean, isGBP: boolean}, dateFormat: {fullDate: boolean, dateAndTime: boolean, monthAndDate: boolean, yearAndMonth: boolean, fullShortDate: boolean}, percentage: boolean, text: boolean, numericalStyle: {orderByASC: boolean, emptyShowWait: boolean, showThousandSplit: boolean, emptyShowNull: boolean, digitNum: null, emptyShowZero: boolean}}, cellSetting: {rowSpan: number, colSpan: number}, fontWeight: boolean, fontColor: string}}
    */
   static setDefaultStyleConfig() {
     return {
@@ -190,7 +202,7 @@ export default class CellInfo {
       fontColor: "#000000",
       // 边框设置
       borderStyle: {
-        leftStyle: {
+        leftBorder: {
           // 边框线条宽度
           width: "1px",
           // 细线
@@ -200,7 +212,7 @@ export default class CellInfo {
           // 边框颜色
           color: "#e8ecf2"
         },
-        rightStyle: {
+        rightBorder: {
           // 边框线条宽度
           width: "1px",
           // 细线
@@ -210,7 +222,7 @@ export default class CellInfo {
           // 边框颜色
           color: "#e8ecf2"
         },
-        topStyle: {
+        topBorder: {
           // 边框线条宽度
           width: "1px",
           // 细线
@@ -220,7 +232,7 @@ export default class CellInfo {
           // 边框颜色
           color: "#e8ecf2"
         },
-        bottomStyle: {
+        bottomBorder: {
           // 边框线条宽度
           width: "1px",
           // 细线
@@ -267,11 +279,46 @@ export default class CellInfo {
   }
 
   /**
+   * @description 设置底部边框及右侧边框的样式
+   * @param style
+   */
+  setBasicBorderStyle(style) {
+    this.setRightBorderStyle(style);
+    this.setBottomBorderStyle(style)
+  }
+
+  /**
+   * @description 设置底部边框及右侧边框的线条宽度
+   * @param width
+   */
+  setBasicBorderWidth(width) {
+    this.setRightBorderWidth(width);
+    this.setBottomBorderWidth(width);
+  }
+
+  /**
    * @description 设置顶部边框颜色
    * @param color
    */
   setTopBorderColor(color) {
-    this.style.borderStyle.topStyle.color = color;
+    this.style.borderStyle.topBorder.color = color;
+  }
+
+  /**
+   * @description 设置顶部边框宽度
+   * @param width
+   */
+  setTopBorderWidth(width) {
+    this.style.borderStyle.topBorder.width = width;
+  }
+
+  /**
+   * @description 设置顶部边框样式
+   * @param style
+   */
+  setTopBorderStyle(style) {
+    this.style.borderStyle.topBorder.isDashed = style === "isDashed";
+    this.style.borderStyle.topBorder.isSolid = style !== "isDashed";
   }
 
   /**
@@ -279,7 +326,24 @@ export default class CellInfo {
    * @param color
    */
   setRightBorderColor(color) {
-    this.style.borderStyle.rightStyle.color = color;
+    this.style.borderStyle.rightBorder.color = color;
+  }
+
+  /**
+   * @description 设置右侧边框宽度
+   * @param width
+   */
+  setRightBorderWidth(width) {
+    this.style.borderStyle.rightBorder.width = width;
+  }
+
+  /**
+   * @description 设置右侧边框样式
+   * @param style
+   */
+  setRightBorderStyle(style) {
+    this.style.borderStyle.rightBorder.isDashed = style === "isDashed";
+    this.style.borderStyle.rightBorder.isSolid = style !== "isDashed";
   }
 
   /**
@@ -287,7 +351,24 @@ export default class CellInfo {
    * @param color
    */
   setBottomBorderColor(color) {
-    this.style.borderStyle.bottomStyle.color = color;
+    this.style.borderStyle.bottomBorder.color = color;
+  }
+
+  /**
+   * @description 设置底部边框宽度
+   * @param width
+   */
+  setBottomBorderWidth(width) {
+    this.style.borderStyle.bottomBorder.width = width;
+  }
+
+  /**
+   * @description 设置底部边框样式
+   * @param type
+   */
+  setBottomBorderStyle(type) {
+    this.style.borderStyle.bottomBorder.isDashed = type === "isDashed";
+    this.style.borderStyle.bottomBorder.isSolid = type !== "isDashed";
   }
 
   /**
@@ -295,7 +376,24 @@ export default class CellInfo {
    * @param color
    */
   setLeftBorderColor(color) {
-    this.style.borderStyle.leftStyle.color = color;
+    this.style.borderStyle.leftBorder.color = color;
+  }
+
+  /**
+   * @description 设置左侧边框宽度
+   * @param width
+   */
+  setLeftBorderWidth(width) {
+    this.style.borderStyle.leftBorder.width = width;
+  }
+
+  /**
+   * @description 设置左侧边框样式
+   * @param type
+   */
+  setLeftBorderStyle(type) {
+    this.style.borderStyle.leftBorder.isDashed = type === "isDashed";
+    this.style.borderStyle.leftBorder.isSolid = type !== "isDashed";
   }
 
   /**
@@ -323,12 +421,71 @@ export default class CellInfo {
   }
 
   /**
+   * @description 移除选中的样式类
+   */
+  removeDuringClass() {
+    this.wasDuring = false;
+  }
+
+  /**
+   * @description 设置选中的样式类
+   */
+  setDuringClass() {
+    this.wasDuring = true;
+  }
+
+  /**
+   * @description 设置单元格的行合并值
+   * @param num
+   */
+  setCellRowSpan(num) {
+    this.style.cellSetting.rowSpan = num;
+  }
+
+  /**
+   * @description 设置单元格的行列并值
+   * @param num
+   */
+  setCellColSpan(num) {
+    this.style.cellSetting.colSpan = num;
+  }
+
+  /**
+   * @description 隐藏单元格
+   * @param row
+   * @param col
+   */
+  setCellHide(row, col) {
+    this.isShow = false;
+    this.wasDuring = false;
+    if (row) {
+      this.setCellRowSpan(row);
+    }
+    if (col) {
+      this.setCellColSpan(col);
+    }
+  }
+
+  /**
+   * @description 显示单元格
+   * @param row
+   * @param col
+   */
+  setCellShow(row, col) {
+    this.isShow = true;
+    if (row) {
+      this.setCellRowSpan(row);
+    }
+    if (col) {
+      this.setCellColSpan(col);
+    }
+  }
+
+  /**
    * @description 设置单元格字体颜色
    * @param color
    */
   setCellFontColor(color) {
     this.style.fontColor = color;
   }
-
 }
-

@@ -1,100 +1,97 @@
 <template>
-  <div class="components-excel-content">
-    <excel-toolbar
-      :store="store"
-    >
-    </excel-toolbar>
-    <table
-      cellpadding="0"
-      cellspacing="0"
-      border="none"
-    >
-      <tr
-        v-for="(item,index) in store.allCells"
-        :key="index"
-      >
-        <excel-cell
-          v-for="(el,eIndex) in item"
-          :key="eIndex"
-          :data-info="el"
-          :class="{
-            'during':
-              store.startRow &&
-              index >= store.startRow &&
-              index <= store.endRow &&
-              eIndex >= store.startCell &&
-              eIndex <= store.endCell
-          }"
-          @mousedown.native="mouseDown(index,eIndex)"
-          @mousemove.native="mouseMove(index,eIndex)"
-          @mouseup.native="mouseUp(index,eIndex)"
+    <div class="components-excel-content">
+        <excel-toolbar
+                :store="store"
         >
-        </excel-cell>
-      </tr>
-    </table>
-  </div>
+        </excel-toolbar>
+        <table
+                cellpadding="0"
+                cellspacing="0"
+                border="none"
+        >
+            <tr
+                    v-for="(item,index) in store.allCells"
+                    :key="index"
+            >
+                <excel-cell
+                        v-for="el in item"
+                        :key="el.id"
+                        :data-info="el"
+                        :class="{
+            'during': el.wasDuring
+          }"
+                        @mousedown.native="mouseDown(el)"
+                        @mousemove.native="mouseMove(el)"
+                        @mouseup.native="mouseUp(el)"
+                >
+                </excel-cell>
+            </tr>
+        </table>
+    </div>
 </template>
 
 <script>
-import excelToolbar from "./toolbar";
-import excelCell from "./cell";
+  import excelToolbar from "./toolbar";
+  import excelCell from "./cell";
 
-export default {
-  name: "EnExcelContent",
-  components: { excelToolbar, excelCell },
-  props: {
-    store: {
-      type: Object,
-      default: () => {
-        return {};
-      }
-    }
-  },
-  data() {
-    return { isSelectCell: false };
-  },
-  methods: {
-    mouseDown(rIndex, cIndex) {
-      this.store.startRow = rIndex;
-      this.store.startCell = cIndex;
-      this.isSelectCell = true;
-    },
-    mouseMove(rIndex, cIndex) {
-      if (this.isSelectCell) {
-        if (rIndex < this.store.startRow && cIndex < this.store.startCell) {
-          this.store.endRow = this.store.startRow;
-          this.store.endCell = this.store.startCell;
-          this.store.startRow = rIndex;
-          this.store.startCell = cIndex;
-        } else {
-          this.store.endRow = rIndex;
-          this.store.endCell = cIndex;
+  export default {
+    name: "EnExcelContent",
+    components: {excelToolbar, excelCell},
+    props: {
+      store: {
+        type: Object,
+        default: () => {
+          return {};
         }
       }
     },
-    mouseUp(rIndex, cIndex) {
-      this.store.endRow = rIndex;
-      this.store.endCell = cIndex;
-      this.store.SelectedCells;
-      this.isSelectCell = false;
+    data() {
+      return {isSelectCell: false};
+    },
+    methods: {
+      /**
+       * @description 鼠标按键按下，记录数据信息
+       * @param elData
+       */
+      mouseDown(elData) {
+        this.isSelectCell = true;
+        this.store.clearCellPositionInfo();
+        this.store.setCellPositionInfo(elData)
+      },
+      /**
+       * @description 鼠标移动，记录坐标信息
+       * @param elData
+       */
+      mouseMove(elData) {
+        if (this.isSelectCell) {
+          this.store.setCellPositionInfo(elData)
+        }
+      },
+      /**
+       * @description 鼠标松开，记录最后一个位置的数据信息
+       * @param elData
+       */
+      mouseUp(elData) {
+        this.store.setCellPositionInfo(elData, true);
+        this.isSelectCell = false;
+      }
     }
-  }
-};
+  };
 </script>
 
 <style lang="scss" scoped>
-  .components-excel-content {
-    table {
-      margin: 20px 20px 20px;
-      width: calc(100% - 40px);
-      display: inline-table;
-      border-collapse: collapse;
-      table-layout: fixed;
+    .components-excel-content {
+        table {
+            margin: 20px 20px 20px;
+            width: calc(100% - 40px);
+            display: inline-table;
+            border-collapse: collapse;
+            table-layout: fixed;
 
-      tr {
-        width: 100%;
-        border-bottom: none;
-      }
+            tr {
+                width: 100%;
+                border-bottom: none;
+            }
+        }
     }
-  }
 </style>

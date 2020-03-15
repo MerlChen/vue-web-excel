@@ -1,11 +1,12 @@
 <template>
   <div class="components-excel">
     <excel-panel
+      v-if="showPanel && showPanel === 'true'"
       :data-info="panelList"
     >
     </excel-panel>
     <excel-content
-      :class="{'show-panel': showPanel}"
+      :class="{'show-panel': showPanel && showPanel === 'true'}"
       :store="store"
     >
     </excel-content>
