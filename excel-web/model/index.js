@@ -25,8 +25,10 @@ export default class Store {
     this.selectedCells = [];
     // 被合并的单元格
     this.mergedCells = [];
-    // 常用变量->调试用
-    this.flag = false;
+    // 合并及被合并的单元格信息
+    this.mergedCellsList = [];
+    // 选中的单元格是否可拆分
+    this.isSplit = false;
   }
 
   /**
@@ -49,11 +51,16 @@ export default class Store {
    */
   reGetSelectedCells() {
     this.selectedCells = [];
+    this.mergedCellsList = [];
     this.allCells.map(rItem => {
       rItem.map(cItem => {
-        // 如果单元格是覆盖状态，将其塞入至选中的数组内
+        // 如果单元格是覆盖状态，并且单元格是显示的，将其塞入至选中的数组内
         if (cItem.wasDuring) {
-          this.selectedCells.push(cItem);
+          if (cItem.style.cellSetting.rowSpan > 0 &&
+            cItem.style.cellSetting.colSpan > 0) {
+            this.selectedCells.push(cItem);
+          }
+          this.mergedCellsList.push(cItem);
           // 如果不存在起点单元格的坐标信息，将单元格的坐标信息赋值
           if (!this.beginCellInfo) {
             this.beginCellInfo = cItem;
@@ -61,6 +68,9 @@ export default class Store {
         }
       });
     });
+    this.isSplit = this.selectedCells.length === 1 &&
+      (this.selectedCells[0].style.cellSetting.colSpan > 1 ||
+        this.selectedCells[0].style.cellSetting.rowSpan > 1);
     this.checkWeightInfo();
   }
 
@@ -70,7 +80,16 @@ export default class Store {
   clearSelectedCells() {
     this.selectedCells.map(item => {
       item.wasDuring = false;
+      item.removeDuringClass();
     });
+    if (this.isSplit) {
+      this.mergedCellsList.map(item => {
+        item.wasDuring = true;
+        item.setDuringClass();
+      });
+      this.isSplit = false;
+    }
+    this.selectedCells = [];
     this.selectedCells = [];
     this.beginCellInfo = null;
     this.minRow = null;
@@ -454,37 +473,62 @@ export default class Store {
         this.minCol = cCol;
       }
     }
-    this.checkMergeCellInfo();
+    // 如果存在合并的单元格，需要检测坐标是否会发生碰撞
+    if (this.mergedCells.length > 0) {
+      this.checkMergeCellInfo();
+      // 否则直接执行单元格状态变更
+    } else {
+      this.checkCellDuringStatus()
+    }
   }
 
+  /**
+   * @description 执行拖拽时与合并单元格的碰撞检查
+   */
   checkMergeCellInfo() {
+    // 暂存之前的起始行列坐标信息
+    let minR = this.minRow, maxR = this.maxRow, minC = this.minCol, maxC = this.maxCol;
     // 遍历合并的单元格是否有影响到此拖拽情况的
     this.mergedCells.map(item => {
-      let rowMin = item.row;
-      let rowMax = item.row + item.style.cellSetting.rowSpan - 1;
-      let colMin = item.col;
-      let colMax = item.col + item.style.cellSetting.colSpan - 1;
-      // 判断列范围内是否影响
-      if (this.maxCol >= colMin && this.minCol <= colMax) {
-        if (this.maxRow >= rowMin &&
-          ((this.minRow >= rowMin && this.minRow <= rowMax) || this.minRow <= rowMin)
-        ) {
-          if (this.minRow > rowMin) {
-            this.minRow = rowMin;
-          }
-          if (this.maxRow <= rowMax) {
-            this.maxRow = rowMax;
-          }
-          if (this.minCol >= colMin) {
-            this.minCol = colMin;
-          }
-          if (this.maxCol <= colMax) {
-            this.maxCol = colMax;
-          }
+      // 合并单元格的起点行
+      let minRow = item.row;
+      // 合并单元格的终点行
+      let maxRow = item.row + item.style.cellSetting.rowSpan - 1;
+      // 合并单元格的起点列
+      let minCol = item.col;
+      // 合并单元格的终点列
+      let maxCol = item.col + item.style.cellSetting.colSpan - 1;
+      // 如果行列都在范围内
+      if (maxC >= minCol && minC <= maxCol && maxR >= minRow && minR <= maxRow) {
+        // 如果终点的行小于合并单元格的终点行
+        if (maxR < maxRow) {
+          // 重置终点行
+          this.maxRow = maxRow;
+        }
+        // 如果起点的行大于合并单元格的起点行
+        if (minR > minRow) {
+          // 重置起点行
+          this.minRow = minRow;
+        }
+        // 如果起点的列大于合并单元格的起点列
+        if (minC > minCol) {
+          // 重置起点裂
+          this.minCol = minCol;
+        }
+        // 如果终点的列小于合并单元格的终点列
+        if (maxC < maxCol) {
+          // 重置终点列
+          this.maxCol = maxCol;
         }
       }
     });
-    this.checkCellDuringStatus();
+    // 如果存在坐标被修改过，那么说明坐标还未确定，需要重新执行一次
+    if (this.minCol !== minC || this.maxCol !== maxC || this.maxRow !== maxR || this.minRow !== minR) {
+      this.checkMergeCellInfo();
+      // 坐标确认之后，执行单元格的状态变更
+    } else {
+      this.checkCellDuringStatus();
+    }
   }
 
   /**
@@ -513,6 +557,16 @@ export default class Store {
     this.beginCellInfo.setCellColSpan(cSpan);
     // 存储合并的单元格信息
     this.mergedCells.push(this.beginCellInfo);
+  }
+
+  /**
+   * @description 执行选中的单元格拆分
+   */
+  splitCellOp() {
+    this.mergedCellsList.map(item => {
+      item.setCellRowSpan(1);
+      item.setCellColSpan(1);
+    })
   }
 
   /**
