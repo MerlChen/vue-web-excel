@@ -119,14 +119,10 @@ export default class CellInfo {
     this.col = col;
     // 单元格绑定的数据
     this.data = data || {};
-    // 单元格是否为合并的状态
-    this.isMerge = false;
     // 单元格的ID
     this.id = id || 0;
     // 单元格是否在选中的范围内
     this.wasDuring = false;
-    // 单元格是否要显示出来
-    this.isShow = true;
   }
 
   /**
@@ -284,7 +280,7 @@ export default class CellInfo {
    */
   setBasicBorderStyle(style) {
     this.setRightBorderStyle(style);
-    this.setBottomBorderStyle(style)
+    this.setBottomBorderStyle(style);
   }
 
   /**
@@ -456,7 +452,6 @@ export default class CellInfo {
    * @param col
    */
   setCellHide(row, col) {
-    this.isShow = false;
     this.wasDuring = false;
     if (row) {
       this.setCellRowSpan(row);
@@ -472,7 +467,6 @@ export default class CellInfo {
    * @param col
    */
   setCellShow(row, col) {
-    this.isShow = true;
     if (row) {
       this.setCellRowSpan(row);
     }

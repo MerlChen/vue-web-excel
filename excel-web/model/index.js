@@ -4,20 +4,29 @@ export default class Store {
   constructor() {
     // 所有的单元格
     this.allCells = [];
-    // 拖拽选中时的起点行下标
-    this.startRow = null;
-    // 拖拽选中时的起点列下标
-    this.startCol = null;
-    // 拖拽选中时的终点行下标
-    this.endRow = null;
-    // 拖拽选中时的终点列下标
-    this.endCol = null;
+    // 拖拽选中的单元格最小的行
+    this.minRow = null;
+    // 拖拽选中的单元格最小的列
+    this.minCol = null;
+    // 拖拽选中的单元格最大的行
+    this.maxRow = null;
+    // 拖拽选中的单元格最大的列
+    this.maxCol = null;
+    // 拖拽开始时选中的节点坐标
+    this.startCellInfo = {
+      row: null,
+      col: null
+    };
     // 选中的最左上角的单元格行列坐标
     this.beginCellInfo = null;
     // 选中的单元格是否全部加粗
     this.allWeight = false;
     // 选中的单元格
     this.selectedCells = [];
+    // 被合并的单元格
+    this.mergedCells = [];
+    // 常用变量->调试用
+    this.flag = false;
   }
 
   /**
@@ -64,53 +73,25 @@ export default class Store {
     });
     this.selectedCells = [];
     this.beginCellInfo = null;
-    this.startRow = null;
-    this.endRow = null;
-    this.startCol = null;
-    this.endCol = null;
+    this.minRow = null;
+    this.maxRow = null;
+    this.minCol = null;
+    this.maxCol = null;
   }
 
   /**
    * @description 检测单元格是否在覆盖范围内
    */
   checkCellDuringStatus() {
-    this.allCells.map((item, row) => {
-      item.map((cItem, col) => {
-        // 如果是向右拖动的
-        if (row >= this.startRow && row <= this.endRow) {
-          this.toggleDuringClass(row, col, cItem);
-        }
-        // 如果是向左拖动的
-        else if (row <= this.startRow && row >= this.endRow) {
-          this.toggleDuringClass(row, col, cItem);
-        }
-        // 都不满足的情况下，移除选中的样式类
-        else {
+    this.allCells.map(item => {
+      item.map(cItem => {
+        if (cItem.row <= this.maxRow && cItem.col <= this.maxCol && cItem.row >= this.minRow && cItem.col >= this.minCol) {
+          cItem.setDuringClass();
+        } else {
           cItem.removeDuringClass();
         }
-      })
+      });
     });
-  }
-
-  /**
-   * @description 设置/取消单元格的选中样式
-   * @param row
-   * @param col
-   * @param cellData
-   */
-  toggleDuringClass(row, col, cellData) {
-    // 如果是向下拖动的
-    if (col >= this.startCol && col <= this.endCol) {
-      cellData.setDuringClass();
-    }
-    // 如果是向上拖动的
-    else if (col <= this.startCol && col >= this.endCol) {
-      cellData.setDuringClass()
-    }
-    // 都不满足的情况下，移除选中的样式类
-    else {
-      cellData.removeDuringClass()
-    }
   }
 
   /**
@@ -225,7 +206,7 @@ export default class Store {
         this.allCells[item.row][item.col - 1].setRightBorderColor(borderColor);
         this.allCells[item.row][item.col - 1].setRightBorderStyle(borderType);
       }
-    })
+    });
   }
 
   /**
@@ -264,7 +245,7 @@ export default class Store {
         this.allCells[item.row][item.col - 1].setRightBorderColor(borderColor);
         this.allCells[item.row][item.col - 1].setRightBorderStyle(borderType);
       }
-    })
+    });
   }
 
   /**
@@ -294,7 +275,7 @@ export default class Store {
       if (item.col !== 0) {
         this.allCells[item.row][item.col - 1].setRightBorderStyle(borderType);
       }
-    })
+    });
   }
 
   /**
@@ -323,7 +304,7 @@ export default class Store {
       if (item.col !== 0) {
         this.allCells[item.row][item.col - 1].setRightBorderStyle(borderType);
       }
-    })
+    });
   }
 
   /**
@@ -406,10 +387,10 @@ export default class Store {
    * @description 移除选中的样式类
    */
   clearCellPositionInfo() {
-    this.startRow = null;
-    this.startCol = null;
-    this.endRow = null;
-    this.endCol = null;
+    this.minRow = null;
+    this.minCol = null;
+    this.maxRow = null;
+    this.maxCol = null;
     this.beginCellInfo = null;
     this.selectedCells.map(item => {
       item.removeDuringClass();
@@ -424,13 +405,17 @@ export default class Store {
    */
   setCellPositionInfo(cellData, getSelected) {
     // 如果不存在起始单元格数据信息
-    if (this.startRow === null && this.startCol === null) {
-      this.startRow = cellData.row;
-      this.startCol = cellData.col;
+    if (this.minRow === null && this.minCol === null) {
+      this.minRow = cellData.row;
+      this.minCol = cellData.col;
+      this.maxRow = cellData.row;
+      this.maxCol = cellData.col;
+      this.startCellInfo = {
+        row: cellData.row,
+        col: cellData.col
+      };
     } else {
-      this.endRow = cellData.row;
-      this.endCol = cellData.col;
-      this.checkDuringCellInfo();
+      this.checkPositionInfo(cellData);
       if (getSelected) {
         this.reGetSelectedCells();
       }
@@ -438,10 +423,67 @@ export default class Store {
   }
 
   /**
-   * @description 检查范围内是否存在合并的单元格
-   * @description 如果存在合并的单元格，进行单元格检验
+   * @description 检测拖到的单元格的坐标体系
+   * @param cellData
    */
-  checkDuringCellInfo() {
+  checkPositionInfo(cellData) {
+    let cRow = cellData.row + cellData.style.cellSetting.rowSpan - 1;
+    let cCol = cellData.col + cellData.style.cellSetting.colSpan - 1;
+    // 判断拖动的方向，以起点为准心
+    // 如果是向下拖动
+    if (cRow > this.startCellInfo.row) {
+      this.maxRow = cRow;
+      // 向右拖动
+      if (cCol > this.startCellInfo.col) {
+        this.maxCol = cCol;
+        // 向左拖动
+      } else {
+        this.maxCol = this.startCellInfo.col;
+        this.minCol = cCol;
+      }
+      // 向上拖动
+    } else {
+      this.minRow = cRow;
+      this.maxRow = this.startCellInfo.row;
+      // 向右拖动
+      if (cCol > this.startCellInfo.col) {
+        this.maxCol = cCol;
+        // 向左拖动
+      } else {
+        this.maxCol = this.startCellInfo.col;
+        this.minCol = cCol;
+      }
+    }
+    this.checkMergeCellInfo();
+  }
+
+  checkMergeCellInfo() {
+    // 遍历合并的单元格是否有影响到此拖拽情况的
+    this.mergedCells.map(item => {
+      let rowMin = item.row;
+      let rowMax = item.row + item.style.cellSetting.rowSpan - 1;
+      let colMin = item.col;
+      let colMax = item.col + item.style.cellSetting.colSpan - 1;
+      // 判断列范围内是否影响
+      if (this.maxCol >= colMin && this.minCol <= colMax) {
+        if (this.maxRow >= rowMin &&
+          ((this.minRow >= rowMin && this.minRow <= rowMax) || this.minRow <= rowMin)
+        ) {
+          if (this.minRow > rowMin) {
+            this.minRow = rowMin;
+          }
+          if (this.maxRow <= rowMax) {
+            this.maxRow = rowMax;
+          }
+          if (this.minCol >= colMin) {
+            this.minCol = colMin;
+          }
+          if (this.maxCol <= colMax) {
+            this.maxCol = colMax;
+          }
+        }
+      }
+    });
     this.checkCellDuringStatus();
   }
 
@@ -455,19 +497,22 @@ export default class Store {
     this.selectedCells.map(item => {
       // 同行的计算出对应的列
       if (item.row === this.beginCellInfo.row && item.col !== this.beginCellInfo.col) {
-        cSpan += item.style.cellSetting.colSpan
+        cSpan += item.style.cellSetting.colSpan;
       }
       // 同列的计算出对应的行
       if (item.row !== this.beginCellInfo.row && item.col === this.beginCellInfo.col) {
-        rSpan += item.style.cellSetting.rowSpan
+        rSpan += item.style.cellSetting.rowSpan;
       }
       // 不是开始的单元格，行列值都设置为0
       if (item !== this.beginCellInfo) {
-        item.setCellHide(0, 0);
+        item.setCellColSpan(0);
+        item.setCellRowSpan(0);
       }
     });
     this.beginCellInfo.setCellRowSpan(rSpan);
     this.beginCellInfo.setCellColSpan(cSpan);
+    // 存储合并的单元格信息
+    this.mergedCells.push(this.beginCellInfo);
   }
 
   /**
