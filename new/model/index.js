@@ -1,4 +1,5 @@
 import cellInfo from "./cellOperation";
+import cellConfig from "./cellConfig";
 
 export default class Store {
   constructor() {
@@ -31,6 +32,10 @@ export default class Store {
     this.isSplit = false;
     // 拖拽的数据源
     this.dragData = {};
+    // 配置相关的信息
+    this.cellConfig = new cellConfig();
+    // 右键菜单的数据
+    this.menuData = {};
   }
 
   /**
@@ -405,21 +410,6 @@ export default class Store {
   }
 
   /**
-   * @description 移除选中的样式类
-   */
-  clearCellPositionInfo() {
-    this.minRow = null;
-    this.minCol = null;
-    this.maxRow = null;
-    this.maxCol = null;
-    this.beginCellInfo = null;
-    this.selectedCells.map(item => {
-      item.removeDuringClass();
-    });
-    this.selectedCells = [];
-  }
-
-  /**
    * @description 拖动选择单元格，进行单元格的数据信息记录
    * @param cellData 单元格信息
    * @param getSelected 是否需要获取选中的单元格
@@ -571,11 +561,29 @@ export default class Store {
     });
   }
 
-  insertBeforeRow(cellData, num) {
-
+  setMenuDataInfo(data) {
+    this.menuData = data;
   }
 
-  insertAfterRow(cellData, num) {
+  /**
+   * @description 在点击的行上方插入指定行
+   * @param num
+   */
+  insertBeforeRow(num) {
+    let flag = false;
+    this.allCells[this.menuData.row].map(item => {
+      let cNum = item.style.cellSetting.colSpan;
+      let rNum = item.style.cellSetting.rowSpan;
+      if (rNum === 0 && cNum === 0) {
+        flag = true;
+      }
+    });
+    if (!flag) {
+      console.log(this.allCells[this.menuData.row]);
+    }
+  }
+
+  insertAfterRow(num) {
 
   }
 

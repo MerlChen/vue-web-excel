@@ -25,7 +25,14 @@
       'height':dataInfo.style.cellStyle.lineHeight && dataInfo.style.cellStyle.lineHeight> 0 ? dataInfo.style.cellStyle.lineHeight + 'px' : null,
     }"
   >
-    {{ dataInfo.row + "_" + dataInfo.col }}
+    {{ dataInfo.row +"_" + dataInfo.col }}
+    <en-icon
+      v-if="store.cellConfig.couldDelete && dataInfo.data.name"
+      name="shanchu-liebiao"
+      class="components-excel-cell-icon"
+      @click.native="removeCellDataInfo"
+    >
+    </en-icon>
   </td>
 </template>
 
@@ -38,6 +45,16 @@ export default {
       default: () => {
         return {};
       }
+    },
+    store: {}
+  },
+  methods: {
+    /**
+     * @description 清除单元格的数据
+     */
+    removeCellDataInfo() {
+      this.dataInfo.removeDataInfo();
+      this.store.clearSelectedCells();
     }
   }
 };
@@ -51,8 +68,25 @@ export default {
     line-height: 40px;
     position: relative;
 
+    .components-excel-cell-icon {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 16px;
+      height: 16px;
+      z-index: 3;
+      cursor: pointer;
+      display: none;
+    }
+
     &.during {
       background-color: #4694df3b !important;
+    }
+
+    &:hover {
+      .components-excel-cell-icon {
+        display: block;
+      }
     }
   }
 </style>

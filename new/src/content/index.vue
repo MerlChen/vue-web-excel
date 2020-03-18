@@ -20,11 +20,12 @@
           :class="{
             'during': el.wasDuring
           }"
+          :store="store"
           draggable="false"
           @mousedown.native="mouseDown(el)"
           @mousemove.native="mouseMove(el)"
           @mouseup.native="mouseUp(el)"
-          @contextmenu.native="showDefineMenu(el)"
+          @contextmenu.native="setDefineData(el)"
           @drop.native="dragEnd(el)"
           @dragover.native.prevent="dragOver(el)"
           @dragleave.native.prevent="dragLevel(el)"
@@ -34,7 +35,6 @@
     </table>
     <define-menu
       :store="store"
-      :data-info="cellInfo"
     >
     </define-menu>
   </div>
@@ -79,7 +79,7 @@ export default {
      */
     mouseDown(elData) {
       this.isSelectCell = true;
-      this.store.clearCellPositionInfo();
+      this.store.clearSelectedCells();
       this.store.setCellPositionInfo(elData);
     },
     /**
@@ -99,8 +99,18 @@ export default {
       this.store.setCellPositionInfo(elData, true);
       this.isSelectCell = false;
     },
+    /**
+     * @description 右键点击，记录数据
+     */
+    setDefineData(elData) {
+      this.store.setMenuDataInfo(elData);
+    },
+    /**
+     * @description 拖拽结束时，设置数据到对应单元格内
+     */
     dragEnd(elData) {
       elData.setDataInfo(this.store.dragData);
+      this.store.clearSelectedCells();
     },
     /**
      * @description 鼠标移入单元格

@@ -61,7 +61,7 @@
 <script>
 export default {
   name: "DefineMenu",
-  props: [ "store", "dataInfo" ],
+  props: ["store", "dataInfo"],
   data() {
     return {
       menuInfo: {
@@ -109,11 +109,17 @@ export default {
         if (e.target.localName === "td") {
           e.preventDefault();
           this.menuInfo.showMenu = true;
-          let maxWidth = document.body.scrollWidth;
-          let defineMenu = this.$refs.defineMenu[0];
-          console.log(defineMenu);
-          this.menuInfo.top = e.clientY - e.layerY + e.target.offsetHeight;
-          this.menuInfo.left = e.clientX - e.layerX + e.target.offsetWidth;
+          setTimeout(() => {
+            let maxWidth = document.body.scrollWidth;
+            let menuWidth = this.$refs.defineMenu.offsetWidth;
+            if (menuWidth + e.clientX - e.layerX + e.target.offsetWidth > maxWidth) {
+              this.menuInfo.top = e.clientY - e.layerY + e.target.offsetHeight;
+              this.menuInfo.left = e.clientX - e.layerX + e.target.offsetWidth - menuWidth;
+            } else {
+              this.menuInfo.top = e.clientY - e.layerY + e.target.offsetHeight;
+              this.menuInfo.left = e.clientX - e.layerX + e.target.offsetWidth;
+            }
+          }, 10);
         }
       });
     },
@@ -121,7 +127,7 @@ export default {
      * @description 在当前单元格上方插入指定行
      */
     insertBeforeRows() {
-      this.store.insertBeforeRow(this.dataInfo, this.insertInfo.beforeRow);
+      this.store.insertBeforeRow(this.insertInfo.beforeRow);
       this.insertInfo.beforeRow = 0;
     },
     /**
@@ -169,6 +175,7 @@ export default {
     width: 146px;
     z-index: 4;
     padding: 8px 0;
+    transition: 0.3s ease-in-out all;
 
     .cell-row-insert-item {
       padding: 0 10px;

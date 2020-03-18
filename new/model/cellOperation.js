@@ -475,8 +475,19 @@ export default class CellInfo {
     }
   }
 
-  setDataInfo() {
+  /**
+   * @description 设置数据
+   * @param data
+   */
+  setDataInfo(data) {
     this.data = data;
+  }
+
+  /**
+   * @description 移除单元格数据信息
+   */
+  removeDataInfo(){
+    this.data = {};
   }
 
   /**
