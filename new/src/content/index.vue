@@ -22,10 +22,10 @@
           }"
           :store="store"
           draggable="false"
-          @mousedown.native="mouseDown(el)"
+          @mousedown.native="mouseDown($event,el)"
           @mousemove.native="mouseMove(el)"
           @mouseup.native="mouseUp(el)"
-          @contextmenu.native="setDefineData(el)"
+          @contextmenu.native.prevent="setDefineData(el)"
           @drop.native="dragEnd(el)"
           @dragover.native.prevent="dragOver(el)"
           @dragleave.native.prevent="dragLevel(el)"
@@ -75,12 +75,16 @@ export default {
   methods: {
     /**
      * @description 鼠标按键按下，记录数据信息
+     * @param $event
      * @param elData
      */
-    mouseDown(elData) {
-      this.isSelectCell = true;
-      this.store.clearSelectedCells();
-      this.store.setCellPositionInfo(elData);
+    mouseDown($event, elData) {
+      // 鼠标点击的时候，需要判断是左键还是右键，右键触发的是自定义菜单，左键是选中
+      if ($event.button !== 2) {
+        this.isSelectCell = true;
+        this.store.clearSelectedCells();
+        this.store.setCellPositionInfo(elData);
+      }
     },
     /**
      * @description 鼠标移动，记录坐标信息

@@ -25,7 +25,7 @@
       'height':dataInfo.style.cellStyle.lineHeight && dataInfo.style.cellStyle.lineHeight> 0 ? dataInfo.style.cellStyle.lineHeight + 'px' : null,
     }"
   >
-    {{ dataInfo.row +"_" + dataInfo.col }}
+    {{ dataInfo.data.name }}
     <en-icon
       v-if="store.cellConfig.couldDelete && dataInfo.data.name"
       name="shanchu-liebiao"

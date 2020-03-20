@@ -486,8 +486,24 @@ export default class CellInfo {
   /**
    * @description 移除单元格数据信息
    */
-  removeDataInfo(){
+  removeDataInfo() {
     this.data = {};
+  }
+
+  /**
+   * @description 设置行坐标信息
+   * @param num
+   */
+  setRowLineNum(num) {
+    this.row = num;
+  }
+
+  /**
+   * @description 设置列坐标信息
+   * @param num
+   */
+  setColLineNum(num) {
+    this.col = num;
   }
 
   /**

@@ -46,7 +46,7 @@ export default {
       type: [ String, Number ],
       default: 10
     },
-    cell: {
+    col: {
       type: [ String, Number ],
       default: 10
     },
@@ -68,7 +68,7 @@ export default {
         if (value.length > 0) {
           this.store.init(value);
         } else {
-          this.store.setDefaultList(this.row, this.cell);
+          this.store.setDefaultList(this.row, this.col);
         }
       }
     }
@@ -78,8 +78,10 @@ export default {
      * @description 配置信息设置
      */
     setConfigInfo() {
-      this.store.cellConfig.couldDelete = this.couldDelete !== "false" && this.couldDelete !== false;;
+      this.store.cellConfig.couldDelete = this.couldDelete !== "false" && this.couldDelete !== false;
       this.store.cellConfig.editAble = this.editAble !== "false" && this.editAble !== false;
+      this.store.cellConfig.row = this.row;
+      this.store.cellConfig.col = this.col;
     }
   }
 };

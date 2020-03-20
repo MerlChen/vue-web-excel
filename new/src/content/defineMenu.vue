@@ -61,7 +61,7 @@
 <script>
 export default {
   name: "DefineMenu",
-  props: ["store", "dataInfo"],
+  props: [ "store", "dataInfo" ],
   data() {
     return {
       menuInfo: {
@@ -127,39 +127,46 @@ export default {
      * @description 在当前单元格上方插入指定行
      */
     insertBeforeRows() {
+      this.clearDataInfo();
       this.store.insertBeforeRow(this.insertInfo.beforeRow);
-      this.insertInfo.beforeRow = 0;
     },
     /**
-     * @description 在当前单元格上方插入指定行
+     * @description 在当前单元格下方插入指定行
      */
     insertAfterRows() {
-      this.store.insertAfterRow(this.dataInfo, this.insertInfo.afterRow);
-      this.insertInfo.afterRow = 0;
+      this.clearDataInfo();
+      this.store.insertAfterRow(this.insertInfo.afterRow);
     },
     /**
      * @description 删除行
      */
     deleteRows() {
-      this.$emit("change", { isDeleteRow: true });
+      this.clearDataInfo();
+      this.store.deleteCurrentRow();
     },
     /**
      * @description 插入列
      */
     insertCells(direction) {
-      this.$emit("change", {
-        isInsertCell: true,
-        result: {
-          isLeft: direction === 1,
-          num: direction === 1 ? this.insertInfo.leftCell : this.insertInfo.rightCell
-        }
-      });
     },
     /**
      * @description 删除列
      */
     deleteCells() {
-      this.$emit("change", { isDeleteCell: true });
+      this.clearDataInfo();
+      this.store.deleteCurrentCol();
+    },
+    /**
+     * @description 清除数据
+     */
+    clearDataInfo() {
+      this.insertInfo = {
+        beforeRow: 1,
+        afterRow: 1,
+        leftCell: 1,
+        rightCell: 1
+      };
+      this.menuInfo.showMenu = false;
     }
   }
 };
