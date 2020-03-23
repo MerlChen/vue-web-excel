@@ -5,11 +5,11 @@
       class="content-tool-bar-item"
       @click="clearStyleInfo"
     >
-      <en-icon
+      <l-icon
         name="qingchugeshi"
         class="content-tool-bar-main-icon"
       >
-      </en-icon>
+      </l-icon>
       <div class="label">
         清除格式
       </div>
@@ -17,53 +17,53 @@
     <!-- 字段格式 -->
     <div class="content-tool-bar-item">
       <div class="content-tool-bar-main">
-        <en-icon
+        <l-icon
           name="geshi-wenben"
           class="content-tool-bar-main-icon"
         >
-        </en-icon>
+        </l-icon>
         <div class="label">
           字段格式
         </div>
-        <en-icon
+        <l-icon
           name="xiala"
           class="content-tool-bar-drop-icon"
         >
-        </en-icon>
+        </l-icon>
       </div>
       <div class="content-tool-bar-menu-list">
         <div class="content-tool-bar-menu-item">
-          <en-icon
+          <l-icon
             name="geshi-wenben"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label">
             文本
           </div>
         </div>
         <div class="content-tool-bar-menu-item">
-          <en-icon
+          <l-icon
             name="shuzhi-ziduangeshi"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label">
             数值
           </div>
-          <en-icon
+          <l-icon
             name="xiayiye"
             class="child-menu-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="child-menu">
             <div class="child-menu-item with-input">
-              <el-input
+              <input
+                class="l-input"
                 v-model="digitLength"
                 type="text"
                 placeholder="请输入"
               >
-              </el-input>
               位小数
             </div>
             <div class="child-menu-item">
@@ -84,19 +84,19 @@
           </div>
         </div>
         <div class="content-tool-bar-menu-item">
-          <en-icon
+          <l-icon
             name="jine-ziduangeshi"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label">
             金额
           </div>
-          <en-icon
+          <l-icon
             name="xiayiye"
             class="child-menu-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="child-menu">
             <div class="child-menu-item">
               ￥
@@ -113,19 +113,19 @@
           </div>
         </div>
         <div class="content-tool-bar-menu-item">
-          <en-icon
+          <l-icon
             name="riqi-ziduangeshi"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label">
             日期
           </div>
-          <en-icon
+          <l-icon
             name="xiayiye"
             class="child-menu-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="child-menu" style="width: 160px;">
             <div class="child-menu-item">
               YYYY/MM/DD
@@ -145,11 +145,11 @@
           </div>
         </div>
         <div class="content-tool-bar-menu-item">
-          <en-icon
+          <l-icon
             name="baifenbi-ziduangeshi"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label">
             百分数
           </div>
@@ -159,30 +159,30 @@
     <!-- 对齐方式 -->
     <div class="content-tool-bar-item">
       <div class="content-tool-bar-main">
-        <en-icon
+        <l-icon
           name="zuoduiqi"
           class="content-tool-bar-main-icon"
         >
-        </en-icon>
+        </l-icon>
         <div class="label">
           对齐方式
         </div>
-        <en-icon
+        <l-icon
           name="xiala"
           class="content-tool-bar-drop-icon"
         >
-        </en-icon>
+        </l-icon>
       </div>
       <div class="content-tool-bar-menu-list">
         <div
           class="content-tool-bar-menu-item"
           @click="textAlign('left')"
         >
-          <en-icon
+          <l-icon
             name="zuoduiqi"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label">
             居左对齐
           </div>
@@ -191,11 +191,11 @@
           class="content-tool-bar-menu-item"
           @click="textAlign('center')"
         >
-          <en-icon
+          <l-icon
             name="juzhongduiqi"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label">
             居中对齐
           </div>
@@ -204,11 +204,11 @@
           class="content-tool-bar-menu-item"
           @click="textAlign('right')"
         >
-          <en-icon
+          <l-icon
             name="youduiqi"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label">
             居右对齐
           </div>
@@ -220,11 +220,11 @@
       class="content-tool-bar-item"
       @click="mergeCellInfo"
     >
-      <en-icon
+      <l-icon
         name="hebing-biaogecaozuo"
         class="content-tool-bar-main-icon"
       >
-      </en-icon>
+      </l-icon>
       <div class="label">
         {{ store.isSplit ? "拆分" : "合并" }}
       </div>
@@ -232,57 +232,55 @@
     <!-- 行高列宽 -->
     <div class="content-tool-bar-item">
       <div class="content-tool-bar-main">
-        <en-icon
+        <l-icon
           name="liekuan"
           class="content-tool-bar-main-icon"
         >
-        </en-icon>
+        </l-icon>
         <div class="label">
           行高列宽
         </div>
-        <en-icon
+        <l-icon
           name="xiala"
           class="content-tool-bar-drop-icon"
         >
-        </en-icon>
+        </l-icon>
       </div>
       <div class="content-tool-bar-menu-list" style="width: 220px">
         <div class="content-tool-bar-menu-item">
-          <en-icon
+          <l-icon
             name="zuoduiqi"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label width-label">
             <div class="component-label">
               设置行高
             </div>
-            <el-input
+            <input
               v-model="lineHeight"
               placeholder="请输入"
-              class="component"
-              @keyup.enter.native="changeLineHeight"
-            >
-            </el-input>
+              class="component l-input"
+              @keyup.enter="changeLineHeight"
+            />
           </div>
         </div>
         <div class="content-tool-bar-menu-item">
-          <en-icon
+          <l-icon
             name="juzhongduiqi"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label width-label">
             <div class="component-label">
               设置列宽
             </div>
-            <el-input
+            <input
               v-model="cellWidth"
               placeholder="请输入"
-              class="component"
-              @keyup.enter.native="changeCellWidth"
-            >
-            </el-input>
+              class="component l-input"
+              @keyup.enter="changeCellWidth"
+            />
           </div>
         </div>
       </div>
@@ -293,11 +291,11 @@
       :class="{'active': store.allWeight}"
       @click="fontWeight"
     >
-      <en-icon
+      <l-icon
         name="zitijiacu"
         class="content-tool-bar-main-icon"
       >
-      </en-icon>
+      </l-icon>
       <div class="label">
         字体加粗
       </div>
@@ -306,17 +304,11 @@
     <div class="content-tool-bar-item">
       <div class="content-tool-bar-main">
         <div class="content-tool-bar-color-picker">
-          <en-icon
+          <l-icon
             name="beijingyanse"
             class="content-tool-bar-main-icon background-color-icon"
           >
-          </en-icon>
-          <el-color-picker
-            v-model="dataInfo.backgroundColor"
-            size="mini"
-            @change="changeBackgroundColor"
-          >
-          </el-color-picker>
+          </l-icon>
           <div
             class="picker-color-container"
             :style="{'background-color': dataInfo.backgroundColor}"
@@ -326,28 +318,22 @@
         <div class="label">
           填充颜色
         </div>
-        <en-icon
+        <l-icon
           name="xiala"
           class="content-tool-bar-drop-icon"
         >
-        </en-icon>
+        </l-icon>
       </div>
     </div>
     <!-- 字体颜色 -->
     <div class="content-tool-bar-item">
       <div class="content-tool-bar-main">
         <div class="content-tool-bar-color-picker">
-          <en-icon
+          <l-icon
             name="zitiyanse1"
             class="content-tool-bar-main-icon"
           >
-          </en-icon>
-          <el-color-picker
-            v-model="dataInfo.color"
-            size="mini"
-            @change="changeFontColor"
-          >
-          </el-color-picker>
+          </l-icon>
           <div
             class="picker-color-container"
             :style="{'background-color': dataInfo.color}"
@@ -357,40 +343,40 @@
         <div class="label">
           字体颜色
         </div>
-        <en-icon
+        <l-icon
           name="xiala"
           class="content-tool-bar-drop-icon"
         >
-        </en-icon>
+        </l-icon>
       </div>
     </div>
     <!-- 边框设置 -->
     <div class="content-tool-bar-item">
       <div class="content-tool-bar-main">
-        <en-icon
+        <l-icon
           name="biankuangshezhi"
           class="content-tool-bar-main-icon"
         >
-        </en-icon>
+        </l-icon>
         <div class="label">
           边框设置
         </div>
-        <en-icon
+        <l-icon
           name="xiala"
           class="content-tool-bar-drop-icon"
         >
-        </en-icon>
+        </l-icon>
       </div>
       <div class="content-tool-bar-menu-list">
         <div
           class="content-tool-bar-menu-item"
           @click="borderSetting('noBorder')"
         >
-          <en-icon
+          <l-icon
             name="wukuangxian"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label">
             无边框
           </div>
@@ -399,11 +385,11 @@
           class="content-tool-bar-menu-item split"
           @click="borderSetting('allBorder')"
         >
-          <en-icon
+          <l-icon
             name="biankuangshezhi"
             class="dropdown-main-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="dropdown-main-label">
             所有边框
           </div>
@@ -412,28 +398,21 @@
           <div class="dropdown-main-label">
             边框颜色
           </div>
-          <en-icon
+          <l-icon
             name="xiayiye"
             class="child-menu-icon"
           >
-          </en-icon>
-          <el-color-picker
-            v-model="borderColor"
-            class="border-color-setting"
-            size="mini"
-            @change="changeBorderColor"
-          >
-          </el-color-picker>
+          </l-icon>
         </div>
         <div class="content-tool-bar-menu-item">
           <div class="dropdown-main-label">
             边框样式
           </div>
-          <en-icon
+          <l-icon
             name="xiayiye"
             class="child-menu-icon"
           >
-          </en-icon>
+          </l-icon>
           <div class="child-menu" style="width: 300px;">
             <div
               class="child-menu-item line-list"
@@ -470,8 +449,10 @@
 </template>
 
 <script>
+import lIcon from "./../../../../l-icon"
 export default {
   name: "Toolbar",
+  components:{ lIcon },
   props: [ "store" ],
   data() {
     return {
@@ -651,7 +632,7 @@ export default {
           &:hover {
             background-color: #F5F8FC !important;
 
-            .en-icon {
+            .l-icon {
               color: #4694df;
             }
 
@@ -761,13 +742,10 @@ export default {
               &.with-input /deep/ {
                 padding: 0 2px;
 
-                .el-input {
+                .l-input {
                   width: 60px;
                   margin-right: 4px;
-
-                  .el-input__inner {
-                    padding: 0 12px;
-                  }
+                  padding: 0 12px;
                 }
               }
 
@@ -819,7 +797,7 @@ export default {
       }
 
       &:hover {
-        .en-icon {
+        .l-icon {
           color: #4694df;
         }
 

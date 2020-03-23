@@ -46,7 +46,7 @@ import excelCell from "./cell";
 import defineMenu from "./defineMenu";
 
 export default {
-  name: "EnExcelContent",
+  name: "ExcelContent",
   components: {
     excelToolbar,
     excelCell,

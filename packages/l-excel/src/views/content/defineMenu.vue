@@ -147,7 +147,7 @@ export default {
     /**
      * @description 插入列
      */
-    insertCells(direction) {
+    insertCells() {
     },
     /**
      * @description 删除列

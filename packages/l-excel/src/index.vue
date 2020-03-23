@@ -15,12 +15,12 @@
 </template>
 
 <script>
-import excelPanel from "./src/panel";
-import excelContent from "./src/content";
+import excelPanel from "./views/panel";
+import excelContent from "./views/content";
 import Store from "./model";
 
 export default {
-  name: "EnExcel",
+  name: "VueExcel",
   components: {
     excelPanel,
     excelContent

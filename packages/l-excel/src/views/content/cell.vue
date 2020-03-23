@@ -26,13 +26,13 @@
     }"
   >
     {{ dataInfo.data.name }}
-    <en-icon
+    <l-icon
       v-if="store.cellConfig.couldDelete && dataInfo.data.name"
       name="shanchu-liebiao"
       class="components-excel-cell-icon"
       @click.native="removeCellDataInfo"
     >
-    </en-icon>
+    </l-icon>
   </td>
 </template>
 
