@@ -447,32 +447,34 @@ export default class CellInfo {
   }
 
   /**
-   * @description 隐藏单元格
-   * @param row
-   * @param col
+   * @description 设置数据
+   * @param data
    */
-  setCellHide(row, col) {
-    this.wasDuring = false;
-    if (row) {
-      this.setCellRowSpan(row);
-    }
-    if (col) {
-      this.setCellColSpan(col);
-    }
+  setDataInfo(data) {
+    this.data = data;
   }
 
   /**
-   * @description 显示单元格
-   * @param row
-   * @param col
+   * @description 移除单元格数据信息
    */
-  setCellShow(row, col) {
-    if (row) {
-      this.setCellRowSpan(row);
-    }
-    if (col) {
-      this.setCellColSpan(col);
-    }
+  removeDataInfo() {
+    this.data = {};
+  }
+
+  /**
+   * @description 设置行坐标信息
+   * @param num
+   */
+  setRowLineNum(num) {
+    this.row = num;
+  }
+
+  /**
+   * @description 设置列坐标信息
+   * @param num
+   */
+  setColLineNum(num) {
+    this.col = num;
   }
 
   /**

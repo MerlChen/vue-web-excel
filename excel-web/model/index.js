@@ -1,4 +1,5 @@
 import cellInfo from "./cellOperation";
+import cellConfig from "./cellConfig";
 
 export default class Store {
   constructor() {
@@ -29,6 +30,12 @@ export default class Store {
     this.mergedCellsList = [];
     // 选中的单元格是否可拆分
     this.isSplit = false;
+    // 拖拽的数据源
+    this.dragData = {};
+    // 配置相关的信息
+    this.cellConfig = new cellConfig();
+    // 右键菜单的数据
+    this.menuData = {};
   }
 
   /**
@@ -403,21 +410,6 @@ export default class Store {
   }
 
   /**
-   * @description 移除选中的样式类
-   */
-  clearCellPositionInfo() {
-    this.minRow = null;
-    this.minCol = null;
-    this.maxRow = null;
-    this.maxCol = null;
-    this.beginCellInfo = null;
-    this.selectedCells.map(item => {
-      item.removeDuringClass();
-    });
-    this.selectedCells = [];
-  }
-
-  /**
    * @description 拖动选择单元格，进行单元格的数据信息记录
    * @param cellData 单元格信息
    * @param getSelected 是否需要获取选中的单元格
@@ -478,7 +470,7 @@ export default class Store {
       this.checkMergeCellInfo();
       // 否则直接执行单元格状态变更
     } else {
-      this.checkCellDuringStatus()
+      this.checkCellDuringStatus();
     }
   }
 
@@ -566,7 +558,210 @@ export default class Store {
     this.mergedCellsList.map(item => {
       item.setCellRowSpan(1);
       item.setCellColSpan(1);
-    })
+    });
+  }
+
+  /**
+   * @description 记录右键菜单点击的数据信息
+   * @param data
+   */
+  setMenuDataInfo(data) {
+    this.menuData = data;
+  }
+
+  /**
+   * @description 在点击的行上方插入指定行
+   * @param num
+   */
+  insertBeforeRow(num) {
+    this.insertRowInfoOp(num);
+  }
+
+  /**
+   * @description 在点击的行下方插入指定行
+   * @param num
+   */
+  insertAfterRow(num) {
+    this.insertRowInfoOp(num, true);
+  }
+
+  /**
+   * @description 插入行处理
+   * @param num
+   * @param isDown
+   */
+  insertRowInfoOp(num, isDown) {
+    if (this.mergedCells.length === 0) {
+      for (let n = 0; n < num; n++) {
+        let newRow = [];
+        let r = this.menuData.row + n;
+        for (let c = 0; c < this.cellConfig.col; c++) {
+          let cellCon = new cellInfo(this, {}, new Date().getTime() + "_" + r + "_" + c, r, c);
+          newRow.push(cellCon);
+        }
+        this.allCells.splice(isDown ? r + 1 : r, 0, newRow);
+      }
+    } else {
+      this.checkCellEffect(num, isDown);
+    }
+    this.resetCellPositionInfo(num);
+  }
+
+  /**
+   * @description 检查插入行时，合并单元格对其的影响
+   * @param num
+   * @param isDown
+   */
+  checkCellEffect(num, isDown) {
+    this.mergedCells.map(item => {
+      let rSpan = item.style.cellSetting.rowSpan;
+      let cSpan = item.style.cellSetting.colSpan;
+      let rNum = item.row + rSpan - 1;
+      let cNum = item.col + cSpan - 1;
+      let cRow = this.menuData.row;
+      let newRow = [];
+      // 如果当前行受到行插入的影响
+      if (rNum > cRow && cRow >= item.row) {
+        for (let i = 0; i < num; i++) {
+          // 更新合并的单元格的行合并值
+          item.setCellRowSpan(rSpan + 1);
+          // 得到新的行数据
+          newRow = this.produceNewRow();
+          // 对新的行数据进行单元格的rowSpan、colSpan处理
+          newRow.map(rItem => {
+            if (item.col <= rItem.col && rItem.col <= cNum) {
+              rItem.setCellRowSpan(0);
+              rItem.setCellColSpan(0);
+            }
+          });
+          this.allCells.splice(isDown ? cRow + 1 : cRow, 0, newRow);
+        }
+        // 如果当前行不受影响
+      } else {
+        for (let i = 0; i < num; i++) {
+          newRow = this.produceNewRow();
+          this.allCells.splice(isDown ? cRow + 1 : cRow, 0, newRow);
+        }
+      }
+    });
+  }
+
+  /**
+   * @description 生成新的一行单元格
+   * @return {Array}
+   */
+  produceNewRow() {
+    let colNum = this.cellConfig.col;
+    let newRow = [];
+    for (let i = 0; i < colNum; i++) {
+      let cell = new cellInfo(this, {}, new Date().getTime() + "_" + i, +"_" + i, i, i);
+      newRow.push(cell);
+    }
+    return newRow;
+  }
+
+  /**
+   * @description 左侧插入列
+   * @param num
+   */
+  insertBeforeCol(num) {
+    this.insertColInfoOp(num, true);
+  }
+
+  /**
+   * @description 右侧插入列
+   * @param num
+   */
+  insertAfterCol(num) {
+    this.insertColInfoOp(num);
+  }
+
+  /**
+   * @description 插入列处理
+   * @param num
+   * @param isLeft
+   */
+  insertColInfoOp(num, isLeft) {
+    // 如果不存在合并的单元格，直接进行插入
+    if (this.mergedCells.length === 0) {
+      let cCol = isLeft ? this.menuData.col : this.menuData.col + 1;
+      this.allCells.map(item => {
+        let cell = new cellInfo(this, {}, new Date().getTime());
+        item.splice(cCol, 0, cell);
+      });
+    } else {
+      this.checkInsertColEffect(num, isLeft);
+    }
+    this.resetCellPositionInfo();
+  }
+
+  /**
+   * @description 在插入列前检测是否收到合并单元格的影响
+   * @param num
+   * @param isLeft
+   */
+  checkInsertColEffect(num, isLeft) {
+    let cCol = isLeft ? this.menuData.col : this.menuData.col + 1;
+    this.mergedCells.map(item => {
+      let cSpan = item.style.cellSetting.colSpan;
+      let iCol = item.col + cSpan - 1;
+      if ((isLeft ? cCol <= iCol : cCol < iCol) && (isLeft ? cCol > item.col : cCol >= item.col)) {
+        for (let i = 0; i < num; i++) {
+          item.setCellColSpan(cSpan + 1);
+        }
+      }
+    });
+    this.allCells.map(item => {
+      let flag = true;
+      item.map(cItem => {
+        let cSpan = cItem.style.cellSetting.colSpan;
+        let iCol = cItem.col + cSpan - 1;
+        if ((cCol > cItem.col && cCol <= iCol) || (cCol > cItem.col && cSpan === 0)) {
+          flag = false;
+        }
+      });
+      for (let i = 0; i < num; i++) {
+        let cell = new cellInfo(this, {}, new Date().getTime());
+        cell.setCellColSpan(flag ? 1 : 0);
+        cell.setCellRowSpan(flag ? 1 : 0);
+        item.splice(cCol, 0, cell);
+      }
+    });
+  }
+
+  /**
+   * @description 删除指定行
+   */
+  deleteCurrentRow() {
+    if (this.mergedCells.length === 0) {
+      this.allCells.splice(this.menuData.row, 1);
+    }
+    this.resetCellPositionInfo();
+  }
+
+  /**
+   * @description 删除指定列
+   */
+  deleteCurrentCol() {
+    if (this.mergedCells.length === 0) {
+      this.allCells.map(item => {
+        item.splice(this.menuData.col, 1);
+      });
+    }
+    this.resetCellPositionInfo();
+  }
+
+  /**
+   * @description 重置单元格的行坐标信息
+   */
+  resetCellPositionInfo() {
+    this.allCells.map((item, index) => {
+      item.map((cItem, cIndex) => {
+        cItem.setRowLineNum(index);
+        cItem.setColLineNum(cIndex);
+        cItem.id = new Date().getTime() + "_" + index + "_" + cIndex;
+      });
+    });
   }
 
   /**
@@ -583,3 +778,4 @@ export default class Store {
     this.allWeight = flag;
   }
 }
+

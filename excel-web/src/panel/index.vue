@@ -51,7 +51,8 @@ export default {
       default: () => {
         return {};
       }
-    }
+    },
+    store: { default: "" }
   },
   data() {
     return { selectedData: {} };
@@ -80,7 +81,7 @@ export default {
       this.selectedData = itemData;
     },
     dragStart(elData) {
-      this.$emit("startDrag", elData);
+      this.store.dragData = elData;
     }
   }
 };
